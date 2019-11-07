@@ -1,0 +1,76 @@
+---
+- import_tasks: debian.yml
+  when: ansible_os_family == "Debian"
+
+- import_tasks: centos.yml
+  when: ansible_distribution == "CentOS"
+
+- name: Install package
+  package:
+    name: nginx
+    state: present
+
+- name: Enable service
+  systemd:
+    name: nginx
+    state: started
+    daemon_reload: yes
+    enabled: yes
+
+- name: Generate config
+  template:
+    src: "{{ item }}.j2"
+    dest: "/etc/nginx/{{ item }}"
+    mode: 0644
+  loop:
+    - nginx.conf
+    - ssl_params
+  notify: restart nginx
+
+- name: Ensure directory exist
+  file:
+    path: "/etc/nginx/sites-{{ item }}"
+    state: directory
+  loop:
+    - available
+    - enabled
+
+- name: Add virtual host
+  template:
+    src: "{{ item.key }}.j2"
+    dest: "/etc/nginx/sites-available/{{ item.value.to }}"
+    mode: 0644
+  with_dict: "{{ domains }}"
+
+- name: Enable virtual host
+  file:
+    src: "/etc/nginx/sites-available/{{ item.to }}"
+    dest: "/etc/nginx/sites-enabled/{{ item.to }}"
+    state: link
+  loop: "{{ domains.values() }}"
+  notify: restart nginx
+
+- name: Remove default virtual host
+  file:
+    path: "/etc/nginx/{{ item }}"
+    state: absent
+  loop:
+    - sites-enabled/default
+    - conf.d/default.conf
+  notify: restart nginx
+
+- name: Create ACME-challenge common directory
+  file:
+    name: /var/www/_letsencrypt
+    owner: www-data
+    group: www-data
+    mode: 0755
+    state: directory
+
+- name: Create install directory
+  file:
+    name: "{{ install_directory }}"
+    owner: www-data
+    group: www-data
+    state: directory
+  when: install_directory is defined

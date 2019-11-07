@@ -1,0 +1,43 @@
+---
+- name: V2ray
+  hosts: selfhost
+  gather_facts: true
+  become: true
+
+  vars:
+    proxy_port: 8600
+    proxy_from: "127.0.0.1:{{ proxy_port }}"
+
+  vars_prompt:
+    - name: email_addr
+      prompt: "Email"
+      default: "your.email@example.com"
+      private: no
+    - name: domain_name
+      prompt: "Domain name"
+      default: "your.domain.example.com"
+      private: no
+    - name: v2ray_ver
+      prompt: "V2Ray version"
+      default: "4.21.3"
+      private: no
+    - name: v2ray_arch
+      prompt: "V2Ray arch"
+      default: "64"
+      private: no
+
+  roles:
+    - role: certbot
+      email: "{{ email_addr }}"
+      domains:
+        - "{{ domain_name }}"
+    - role: nginx
+      domains:
+        proxy:
+          to: "{{ domain_name }}"
+          from: "{{ proxy_from }}"
+      srv_name: "v2ray"
+    - role: v2ray
+      app_ver: "{{ v2ray_ver }}"
+      app_arch: "{{ v2ray_arch }}"
+      app_port: "{{ proxy_port }}"

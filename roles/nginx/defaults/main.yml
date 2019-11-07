@@ -1,0 +1,5 @@
+---
+srv_name: default
+enabled_https: True
+enabled_websocket: True
+add_location: False

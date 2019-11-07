@@ -1,0 +1,32 @@
+{
+  "inbounds": [
+    {
+      "port": {{ app_port }},
+      "listen": "127.0.0.1",
+      "protocol": "vmess",
+      "settings": {
+        "clients": [
+          {
+            "id": "{{ uuid.stdout }}",
+            "alterId": 64
+          }
+        ]
+      },
+      "streamSettings": {
+        "network": "ws",
+        "wsSettings": {
+          "path": "/"
+        },
+        "sockopt": {
+          "tcpFastOpen": true
+        }
+      }
+    }
+  ],
+  "outbounds": [
+    {
+      "protocol": "freedom",
+      "settings": {}
+    }
+  ]
+}

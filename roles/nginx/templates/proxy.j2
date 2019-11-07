@@ -1,0 +1,52 @@
+upstream {{ srv_name }}_backend {
+    server {{ domains.proxy.from }};
+
+    keepalive 128;
+}
+
+server {
+    listen 80;
+    server_name {{ domains.proxy.to }};
+{% if enabled_https %}
+    return 301 https://$host$request_uri;
+}
+
+server {
+    listen 443 ssl http2;
+    server_name {{ domains.proxy.to }};
+
+    ssl_certificate /etc/letsencrypt/live/{{ domains.proxy.to }}/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/{{ domains.proxy.to }}/privkey.pem;
+    ssl_trusted_certificate /etc/letsencrypt/live/{{ domains.proxy.to }}/fullchain.pem;
+    include /etc/nginx/ssl_params;
+{% endif %}
+
+    access_log /var/log/nginx/{{ domains.proxy.to }}_access.log;
+    error_log /var/log/nginx/{{ domains.proxy.to }}_error.log warn;
+
+    location / {
+        proxy_pass http://{{ srv_name }}_backend;
+        proxy_http_version 1.1;
+        proxy_redirect off;
+
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_set_header X-Forwarded-Host $host;
+        proxy_set_header X-Forwarded-Port $server_port;
+        proxy_set_header X-Nginx-Proxy true;
+
+{% if enabled_websocket %}
+        # For WebSocket
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection "Upgrade";
+{% else %}
+        proxy_set_header Connection "";
+{% endif %}
+    }
+
+{% if add_location %}
+    {{ add_location }}
+{% endif %}
+}
