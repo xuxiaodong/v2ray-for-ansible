@@ -23,10 +23,10 @@ GNU/Linux 10 上测试通过。Debian GNU/Linux 更低版本或 Ubuntu
 
 1. 将服务器的 IP 添加到 `inventory/selfhost` 文件：
 
-    $ echo 'your.ip.address' >> inventory/selfhost
+        $ echo 'your.ip.address' >> inventory/selfhost
 
 2. 执行 Playbook 并按提示操作：
 
-    $ ansible-playbook v2ray.yml
+        $ ansible-playbook v2ray.yml
 
 3. Enjoy.
