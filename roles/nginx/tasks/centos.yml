@@ -1,4 +1,5 @@
 ---
+  
 - name: Add rpm key
   rpm_key:
     key: http://nginx.org/keys/nginx_signing.key
@@ -11,3 +12,7 @@
     description: NGINX Repository
     enabled: yes
     gpgcheck: yes
+    
+- name: Set nginx user
+  set_fact:
+    nginx_user: nginx

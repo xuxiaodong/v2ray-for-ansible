@@ -44,10 +44,10 @@
 
 - name: Enable virtual host
   file:
-    src: "/etc/nginx/sites-available/{{ item.to }}"
-    dest: "/etc/nginx/sites-enabled/{{ item.to }}"
+    src: "/etc/nginx/sites-available/{{ item.value.to }}"
+    dest: "/etc/nginx/sites-enabled/{{ item.value.to }}"
     state: link
-  loop: "{{ domains.values() }}"
+  with_dict: "{{ domains}}"
   notify: restart nginx
 
 - name: Remove default virtual host
@@ -62,15 +62,15 @@
 - name: Create ACME-challenge common directory
   file:
     name: /var/www/_letsencrypt
-    owner: www-data
-    group: www-data
+    owner: "{{ nginx_user }}"
+    group: "{{ nginx_user }}"
     mode: 0755
     state: directory
 
 - name: Create install directory
   file:
     name: "{{ install_directory }}"
-    owner: www-data
-    group: www-data
+    owner: "{{ nginx_user }}"
+    group: "{{ nginx_user }}"
     state: directory
   when: install_directory is defined

@@ -19,7 +19,7 @@
       private: no
     - name: v2ray_ver
       prompt: "V2Ray version"
-      default: "4.21.3"
+      default: "4.32.1"
       private: no
     - name: v2ray_arch
       prompt: "V2Ray arch"
