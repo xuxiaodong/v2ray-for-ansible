@@ -1,7 +1,7 @@
 # V2Ray for Ansible
 
 本 Playbook 将利用 Ansible 在服务器上自动化部署 V2Ray。目前，仅在 Debian
-GNU/Linux 10 上测试通过。Debian GNU/Linux 更低版本或 Ubuntu
+GNU/Linux 10,Centos 7 上测试通过。Debian GNU/Linux 更低版本或 Ubuntu
 系列大概也没有问题，其它 Linux
 发行版本有待进一步测试。使用本仓库请自行承担风险。
 
